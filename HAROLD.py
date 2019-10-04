@@ -16,7 +16,7 @@ def main():
         f = open(base_dir, "r")
         ID = f.read()
         f.close()
-        if != 'not found.\n'
+        if ID != 'not found.\n'
             print(ID)
             break
         else:
