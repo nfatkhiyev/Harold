@@ -18,11 +18,13 @@ def main():
         f.close()
         if ID != 'not found.\n':
             print(ID)
+            d = open(delete_dir, "w")
+            d.write(ID)
             break
         else:
             print("Waiting")
 
-        print("FINISHED")
+    print("FINISHED")
 
 if __name__ == '__main__':
     main()
