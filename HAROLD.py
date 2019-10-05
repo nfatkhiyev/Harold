@@ -16,6 +16,7 @@ def main():
         f = open(base_dir, "r")
         ID = f.read()
         f.close()
+        time.sleep(1)
         if ID != 'not found.\n':
             print(ID)
             d = open(delete_dir, "w")
