@@ -8,12 +8,14 @@ import RPi.GPIO as GPIO
 #from urllib import urlencode
 import config
 
+sudoPassword = config.SUDO_PASSWORD
+
 os.system('modprobe wire timeout=1 slave_ttl=5')
 os.system('modprobe w1-gpio')
 os.system('modprobe w1-smem')
-os.system('chmod a+w /sys/devices/w1_bus_master1/w1_master_slaves')
-os.system('chmod a+w /sys/devices/w1_bus_master1/w1_master_remove')
-os.system('chmod a+w /sys/devices/w1_bus_master1/w1_master_search')
+os.system('echo %s|sudo chmod a+w /sys/devices/w1_bus_master1/w1_master_slaves' % (sudoPassword))
+os.system('echo %s|sudo chmod a+w /sys/devices/w1_bus_master1/w1_master_remove' % (sudoPassword))
+os.system('echo %s|sudo chmod a+w /sys/devices/w1_bus_master1/w1_master_search' % (sudoPassword))
 base_dir = '/sys/devices/w1_bus_master1/w1_master_slaves'
 delete_dir = '/sys/devices/w1_bus_master1/w1_master_remove'
 
