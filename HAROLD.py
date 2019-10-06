@@ -8,32 +8,32 @@ import RPi.GPIO as GPIO
 #from urllib import urlencode
 import config
 
-#os.system('modprobe wire timeout=1 slave_ttl=5')
-#os.system('modprobe w1-gpio')
-#os.system('modprobe w1-smem')
-#os.system('chmod a+w /sys/devices/w1_bus_master1/w1_master_slaves')
-#os.system('chmod a+w /sys/devices/w1_bus_master1/w1_master_remove')
-#os.system('chmod a+w /sys/devices/w1_bus_master1/w1_master_search')
+os.system('modprobe wire timeout=1 slave_ttl=5')
+os.system('modprobe w1-gpio')
+os.system('modprobe w1-smem')
+os.system('chmod a+w /sys/devices/w1_bus_master1/w1_master_slaves')
+os.system('chmod a+w /sys/devices/w1_bus_master1/w1_master_remove')
+os.system('chmod a+w /sys/devices/w1_bus_master1/w1_master_search')
 base_dir = '/sys/devices/w1_bus_master1/w1_master_slaves'
 delete_dir = '/sys/devices/w1_bus_master1/w1_master_remove'
 
-#instance = csh_ldap.CSHLDAP("uid=nfatkhiyev,cn=users,cn=accounts,dc=csh,dc=rit,dc=edu", config.PASSWORD)
+instance = csh_ldap.CSHLDAP("uid=nfatkhiyev,cn=users,cn=accounts,dc=csh,dc=rit,dc=edu", config.PASSWORD)
 
 HAROLD_AUTH = config.harold_auth
 
 #pygame.mixer.init()
 
 def main():
-    #while True:
-    #    f = open(base_dir, "r")
-    #    ID = f.read()
-    #    f.close()
-    #    time.sleep(1)
-    #    if ID != 'not found.\n':
-    #        print(ID)
-    #        break
-    #    else:
-    #        print("Waiting")
+    while True:
+        f = open(base_dir, "r")
+        ID = f.read()
+        f.close()
+        time.sleep(1)
+        if ID != 'not found.\n':
+            print(ID)
+            break
+        else:
+            print("Waiting")
 
     gets3Link(getAudiophiler("nfatkhiyev"))
     #pygame.mixer.music.load("music.mp3")
@@ -44,10 +44,10 @@ def main():
     print("FINISHED")
 
 
-#def getUID(iButtonCode):
-    #user = instance.get_member_ibutton(iButtonCode)
-    #UID = user.uid
-    #return UID
+def getUID(iButtonCode):
+    user = instance.get_member_ibutton(iButtonCode)
+    UID = user.uid
+    return UID
 
 def getAudiophiler(UID):
     getHaroldURL = "https://audiophiler.csh.rit.edu/get_harold/" + UID
