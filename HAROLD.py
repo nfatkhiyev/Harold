@@ -10,9 +10,9 @@ import config
 
 sudoPassword = config.SUDO_PASSWORD
 
-os.system('modprobe wire timeout=1 slave_ttl=5')
-os.system('modprobe w1-gpio')
-os.system('modprobe w1-smem')
+os.system('echo %s|sudo modprobe wire timeout=1 slave_ttl=5' % (sudoPassword))
+os.system('echo %s|sudo modprobe w1-gpio' % (sudoPassword))
+os.system('echo %s|sudo modprobe w1-smem' % (sudoPassword))
 os.system('echo %s|sudo chmod a+w /sys/devices/w1_bus_master1/w1_master_slaves' % (sudoPassword))
 os.system('echo %s|sudo chmod a+w /sys/devices/w1_bus_master1/w1_master_remove' % (sudoPassword))
 os.system('echo %s|sudo chmod a+w /sys/devices/w1_bus_master1/w1_master_search' % (sudoPassword))
