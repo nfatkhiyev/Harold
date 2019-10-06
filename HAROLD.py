@@ -69,7 +69,7 @@ def getAudiophiler(UID):
         s3Link = requests.post(url = getHaroldURL, json = params)
         print(s3Link.text)
         return s3Link.text
-    except Exception e:
+    except:
         print(e)
         getDefaultURL = "https://audiophiler.csh.rit.edu/get_harold/nfatkhiyev" 
         paramsD = {
