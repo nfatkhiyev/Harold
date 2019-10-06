@@ -28,6 +28,7 @@ pygame.mixer.init()
 
 def main():
     ID = ""
+    fileExtension = ""
     while True:
         while True: 
             time.sleep(0.5)
@@ -45,10 +46,10 @@ def main():
         ID = "*" + ID[3:].strip() + "01"
         print(ID)
         gets3Link(getAudiophiler(getUID(ID)))
-        #pygame.mixer.music.load("music.mp3")
-        #pygame.mixer.music.play()
-        #time.sleep(30)
-        #pygame.mixer.music.stop()
+        pygame.mixer.music.load("music" + fileExtension)
+        pygame.mixer.music.play()
+        time.sleep(30)
+        pygame.mixer.music.stop()
         deleteMusic()
         ID =""
         print("FINISHED")
@@ -81,7 +82,9 @@ def gets3Link(link):
     music = requests.get(link, allow_redirects=True)
     open('music', 'wb').write(music.content)
     getFileTye = filetype.guess('music')
+    fileExtension = getFileTye.extension
     print(getFileTye)
+    open('music' + fileExtension, 'wb').write(music.content)
 
 def deleteMusic():
     os.remove("music")
