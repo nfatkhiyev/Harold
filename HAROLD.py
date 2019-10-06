@@ -5,7 +5,8 @@ import requests
 import pygame
 import RPi.GPIO as GPIO
 
-from HAROLD import config
+from urllib import urlencode
+import config
 
 os.system('modprobe wire timeout=1 slave_ttl=5')
 os.system('modprobe w1-gpio')
@@ -16,7 +17,7 @@ os.system('chmod a+w /sys/devices/w1_bus_master1/w1_master_search')
 base_dir = '/sys/devices/w1_bus_master1/w1_master_slaves'
 delete_dir = '/sys/devices/w1_bus_master1/w1_master_remove'
 
-instance = csh_ldap.CSHLDAP(uid=nfatkhiyev,cn=users,cn=accounts,dc=csh,dc=rit,dc=edu, config.PASSWORD)
+instance = csh_ldap.CSHLDAP("uid=nfatkhiyev,cn=users,cn=accounts,dc=csh,dc=rit,dc=edu", config.PASSWORD)
 
 HAROLD_AUTH = config.harold_auth
 
@@ -53,8 +54,9 @@ def getAudiophiler(UID):
     params = urlencode({
             'auth':HAROLD_AUTH,
     })
-    s3Link = requests.post(getHaroldURL, params.encode('utf-8'))
-    return s3Link
+    s3Link = requests.post(url = getHaroldURL, data = params.encode('utf-8'))
+    print(s3Link.text)
+    return s3Link.text
 
 def gets3Link(link):
     music = requests.get(link, allow_redirects=True)
