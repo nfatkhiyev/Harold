@@ -27,7 +27,6 @@ pygame.mixer.init()
 
 def main():
     ID = ""
-    fileExtension = ""
     while True:
         while True: 
             time.sleep(0.5)
@@ -47,7 +46,11 @@ def main():
         gets3Link(getAudiophiler(getUID(ID)))
         pygame.mixer.music.load("music")
         pygame.mixer.music.play()
-        time.sleep(30)
+        while True:
+            if pygame.mixer.get_busy() != True:
+                break
+            else:
+                print("busy")
         pygame.mixer.music.stop()
         deleteMusic()
         ID =""
