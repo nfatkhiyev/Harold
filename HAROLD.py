@@ -2,7 +2,8 @@ import os
 import time
 import csh_ldap
 import requests
-#import pygame
+import pygame
+import filetype
 import RPi.GPIO as GPIO
 
 #from urllib import urlencode
@@ -23,12 +24,12 @@ instance = csh_ldap.CSHLDAP("uid=nfatkhiyev,cn=users,cn=accounts,dc=csh,dc=rit,d
 
 HAROLD_AUTH = config.harold_auth
 
-#pygame.mixer.init()
+pygame.mixer.init()
 
 def main():
     ID = ""
     while True:
-        while True: # TODO make True
+        while True: 
             time.sleep(0.5)
             f = open(base_dir, "r")
             ID = f.read()
@@ -43,8 +44,12 @@ def main():
 
         ID = "*" + ID[3:].strip() + "01"
         print(ID)
-        os.system('echo %s|sudo vlc %s' % (sudoPassword, gets3Link(getAudiophiler(getUID(ID)))))
-        time.sleep(30)
+        gets3Link(getAudiophiler(getUID(ID)))
+        #pygame.mixer.music.load("music.mp3")
+        #pygame.mixer.music.play()
+        #time.sleep(30)
+        #pygame.mixer.music.stop()
+        deleteMusic()
         ID =""
         print("FINISHED")
 
@@ -63,7 +68,7 @@ def getAudiophiler(UID):
         s3Link = requests.post(url = getHaroldURL, json = params)
         print(s3Link.text)
         return s3Link.text
-    except requests.exceptions.RequestException as e:
+    except Exception e:
         print(e)
         getDefaultURL = "https://audiophiler.csh.rit.edu/get_harold/nfatkhiyev" 
         paramsD = {
@@ -74,10 +79,12 @@ def getAudiophiler(UID):
 
 def gets3Link(link):
     music = requests.get(link, allow_redirects=True)
-    open('music.mp3', 'wb').write(music.content)
+    open('music', 'wb').write(music.content)
+    getFileTye = filetype.guess('music')
+    print(getFileTye)
 
 def deleteMusic():
-    os.remove("music.mp3")
+    os.remove("music")
 
 if __name__ == '__main__':
     main()
