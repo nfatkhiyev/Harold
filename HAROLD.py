@@ -2,7 +2,7 @@ import os
 import time
 import csh_ldap
 import requests
-#import pygame
+import pygame
 import RPi.GPIO as GPIO
 
 #from urllib import urlencode
@@ -23,27 +23,33 @@ instance = csh_ldap.CSHLDAP("uid=nfatkhiyev,cn=users,cn=accounts,dc=csh,dc=rit,d
 
 HAROLD_AUTH = config.harold_auth
 
-#pygame.mixer.init()
+pygame.mixer.init()
 
 def main():
+    ID = ""
     while True:
-        f = open(base_dir, "r")
-        ID = f.read()
-        f.close()
-        time.sleep(1)
-        if ID != 'not found.\n':
-            print(ID)
-            break
-        else:
-            print("Waiting")
+        while True: # TODO make True
+            f = open(base_dir, "r")
+            ID = f.read()
+            f.close()
+            time.sleep(0.5)
+            if ID != 'not found.\n':
+                print(ID)
+                d = open(delete_dir, "w")
+                d.write(ID)
+                break
+            else:
+                print("Waiting")
 
-    gets3Link(getAudiophiler("nfatkhiyev"))
-    #pygame.mixer.music.load("music.mp3")
-    #pygame.mixer.music.play()
-    time.sleep(30)
-    #pygame.mixer.music.stop()
-    deleteMusic()
-    print("FINISHED")
+        ID = "*" + ID[3:].strip() + "01"
+        print(ID)
+        gets3Link(getAudiophiler(getUID(ID)))
+        pygame.mixer.music.load("music.mp3")
+        pygame.mixer.music.play()
+        time.sleep(30)
+        pygame.mixer.music.stop()
+        deleteMusic()
+        print("FINISHED")
 
 
 def getUID(iButtonCode):
