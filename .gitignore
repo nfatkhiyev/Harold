@@ -5,3 +5,5 @@ config.py
 /venv
 error.log
 .Harold.py.swp
+HAROLD.py.save
+scanComplete
