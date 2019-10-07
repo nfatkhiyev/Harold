@@ -32,6 +32,7 @@ def main():
             time.sleep(0.5)
             f = open(base_dir, "r")
             ID = f.read()
+            time.sleep(0.1)
             f.close()
             if ID != 'not found.\n':
                 print(ID)
@@ -44,14 +45,17 @@ def main():
         ID = "*" + ID[3:].strip() + "01"
         print(ID)
         gets3Link(getAudiophiler(getUID(ID)))
-        pygame.mixer.music.load("music")
-        pygame.mixer.music.play()
-        while True:
-            if pygame.mixer.get_busy() != True:
-                break
-            else:
-                print("busy")
-        pygame.mixer.music.stop()
+        try:
+            pygame.mixer.music.load("music")
+            pygame.mixer.music.play()
+
+            while True:
+                if pygame.mixer.music.get_busy() == False or pygame.mixer.music.get_pos()/1000 > 30:
+                    break
+            pygame.mixer.music.stop()
+        except:
+            os.system('vlc --stop-time 30 music --sout-al vlc://quit')
+
         deleteMusic()
         ID =""
         print("FINISHED")
@@ -81,8 +85,12 @@ def getAudiophiler(UID):
         return defaultLink.text
 
 def gets3Link(link):
-    music = requests.get(link, allow_redirects=True)
-    open('music', 'wb').write(music.content)
+    try:
+        music = requests.get(link, allow_redirects=True)
+        open('music', 'wb').write(music.content)
+    except:
+        music = requests.get(getAudiophiler("nfatkhiyev"), allow_redirects=True)
+        open('music', 'wb').write(music.content)
 
 def deleteMusic():
     os.remove("music")

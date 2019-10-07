@@ -3,3 +3,5 @@ TEST.py
 config.py
 /__pycache__
 /venv
+error.log
+.Harold.py.swp
