@@ -1,3 +1,4 @@
+#main imports
 import os
 import time
 import csh_ldap
@@ -29,7 +30,7 @@ HAROLD_AUTH = config.harold_auth
 
 pygame.mixer.init()
 
-#main
+#main function
 def main():
     ID = " "
     #keep the whole program running so it doesn't play one song and stop
@@ -47,7 +48,6 @@ def main():
                 print(ID)
                 pygame.mixer.music.load("scanComplete")
                 pygame.mixer.music.play()
-                time.sleep(3)
                 #add the found I-Button to the base directory
                 while True:
                     f2 = open(base_dir, "r")
@@ -67,17 +67,23 @@ def main():
         #play the music from the I-Button that currently exists in the base directory
         ID = "*" + ID[3:].strip() + "01"
         gets3Link(getAudiophiler(getUID(ID)))
+        #try to play music and if you can't play the music then quit the vlc process
         try:
+            #load the music
             pygame.mixer.music.load("music")
             pygame.mixer.music.play()
+            #play the music for thirty seconds
             while True:
                 if pygame.mixer.music.get_busy() == False or pygame.mixer.music.get_pos()/1000 > 30:
                     break
+            #stop the music
             pygame.mixer.music.stop()
+            #delete the music file from the root directory
             deleteMusic()
         except:
             os.system('vlc --stop-time 30 music --sout-al vlc://quit')
 
+        #reset variables
         ID = " "
         print("FINISHED")
 
