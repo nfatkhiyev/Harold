@@ -4,8 +4,6 @@ import csh_ldap
 import requests
 import pygame
 import RPi.GPIO as GPIO
-
-#from urllib import urlencode
 import config
 
 sudoPassword = config.SUDO_PASSWORD
@@ -26,36 +24,51 @@ HAROLD_AUTH = config.harold_auth
 pygame.mixer.init()
 
 def main():
-    ID = ""
+    ID = " "
+    songsPlayed = 0
     while True:
-        while True: 
+        while True:
             time.sleep(0.5)
             f = open(base_dir, "r")
-            ID = f.read()
+            ID = f.readline()
+            time.sleep(0.1)
             f.close()
             if ID != 'not found.\n':
                 print(ID)
-                d = open(delete_dir, "w")
-                d.write(ID)
+                pygame.mixer.music.load("scanComplete")
+                pygame.mixer.music.play()
+                time.sleep(3)
+                while True:
+                    f2 = open(base_dir, "r")
+                    test = f2.readline()
+                    f2.close()
+                    if test != 'not found.\n':
+                        d = open(delete_dir, "w")
+                        d.write(test)
+                        continue
+                    else:
+                        print("iButton read file is clean")
+                        break
                 break
             else:
                 print("Waiting")
 
         ID = "*" + ID[3:].strip() + "01"
-        print(ID)
         gets3Link(getAudiophiler(getUID(ID)))
-        pygame.mixer.music.load("music")
-        pygame.mixer.music.play()
-        while True:
-            if pygame.mixer.get_busy() != True:
-                break
-            else:
-                print("busy")
-        pygame.mixer.music.stop()
-        deleteMusic()
+        try:
+            pygame.mixer.music.load("music")
+            pygame.mixer.music.play()
+
+            while True:
+                if pygame.mixer.music.get_busy() == False or pygame.mixer.music.get_pos()/1000 > 30:
+                    break
+            pygame.mixer.music.stop()
+            deleteMusic()
+        except:
+            os.system('vlc --stop-time 30 music --sout-al vlc://quit')
+
         ID =""
         print("FINISHED")
-
 
 def getUID(iButtonCode):
     user = instance.get_member_ibutton(iButtonCode)
@@ -73,7 +86,7 @@ def getAudiophiler(UID):
         return s3Link.text
     except:
         print(e)
-        getDefaultURL = "https://audiophiler.csh.rit.edu/get_harold/nfatkhiyev" 
+        getDefaultURL = "https://audiophiler.csh.rit.edu/get_harold/nfatkhiyev"
         paramsD = {
             'auth_key':HAROLD_AUTH
         }
@@ -81,12 +94,15 @@ def getAudiophiler(UID):
         return defaultLink.text
 
 def gets3Link(link):
-    music = requests.get(link, allow_redirects=True)
-    open('music', 'wb').write(music.content)
+    try:
+        music = requests.get(link, allow_redirects=True)
+        open('music', 'wb').write(music.content)
+    except:
+        music = requests.get(getAudiophiler("nfatkhiyev"), allow_redirects=True)
+        open('music', 'wb').write(music.content)
 
 def deleteMusic():
     os.remove("music")
 
 if __name__ == '__main__':
     main()
-        
