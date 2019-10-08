@@ -39,11 +39,11 @@ def main():
     #keep the whole program running so it doesn't play one song and stop
     while True:
         #while loop per song
-        if 23 >= timeNow.tm_hour >= 7:
-            volume = 0.7
-        else:
-            volume = 0.3
-        while True: 
+        while True:
+            if 23 >= timeNow.tm_hour >= 7:
+                volume = 0.7
+            else:
+                volume = 0.3
             #read the file and set the ID to the I-Button that was read 
             time.sleep(0.5)
             f = open(base_dir, "r")
