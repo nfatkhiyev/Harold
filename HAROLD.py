@@ -30,12 +30,19 @@ HAROLD_AUTH = config.harold_auth
 
 pygame.mixer.init()
 
+timeNow = time.localtime()
+
 #main function
 def main():
     ID = " "
+    volume = 0.0
     #keep the whole program running so it doesn't play one song and stop
     while True:
         #while loop per song
+        if 15 >= timeNow.tm_hour >= 9:
+            volume = 0.7
+        else:
+            volume = 0.3
         while True: 
             #read the file and set the ID to the I-Button that was read 
             time.sleep(0.5)
@@ -48,6 +55,7 @@ def main():
                 print(ID)
                 pygame.mixer.music.load("scanComplete")
                 pygame.mixer.music.play()
+                pygame.mixer.music.set_volume(volume)
                 #add the found I-Button to the base directory
                 while True:
                     f2 = open(base_dir, "r")
@@ -72,6 +80,7 @@ def main():
             #load the music
             pygame.mixer.music.load("music")
             pygame.mixer.music.play()
+            pygame.mixer.music.set_volume(volume)
             #play the music for thirty seconds
             while True:
                 if pygame.mixer.music.get_busy() == False or pygame.mixer.music.get_pos()/1000 > 30:
