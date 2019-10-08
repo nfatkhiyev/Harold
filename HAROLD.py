@@ -4,6 +4,8 @@ import time
 import csh_ldap
 import requests
 import pygame
+import vlc
+from pygame import mixer
 import RPi.GPIO as GPIO
 
 #import the config file
@@ -48,6 +50,7 @@ def main():
                 print(ID)
                 pygame.mixer.music.load("scanComplete")
                 pygame.mixer.music.play()
+                time.sleep(3)
                 #add the found I-Button to the base directory
                 while True:
                     f2 = open(base_dir, "r")
@@ -80,8 +83,14 @@ def main():
             pygame.mixer.music.stop()
             #delete the music file from the root directory
             deleteMusic()
-        except:
-            os.system('vlc --stop-time 30 music --sout-al vlc://quit')
+        except Exception as e:
+            #os.system('vlc --stop-time 30 music --sout-al vlc://quit')
+            print(e)
+            player2 = vlc.MediaPlayer("/home/pi/Harold/music")
+            player2.play()
+            time.sleep(30)
+            player2.stop()
+            deleteMusic()
 
         #reset variables
         ID = " "
@@ -103,7 +112,7 @@ def getAudiophiler(UID):
         s3Link = requests.post(url = getHaroldURL, json = params)
         print(s3Link.text)
         return s3Link.text
-    except:
+    except Exception as e:
         print(e)
         getDefaultURL = "https://audiophiler.csh.rit.edu/get_harold/nfatkhiyev" 
         paramsD = {
