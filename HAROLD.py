@@ -34,12 +34,12 @@ timeNow = time.localtime()
 
 #main function
 def main():
-    ID = " "
+    ID = ""
     volume = 0.0
     #keep the whole program running so it doesn't play one song and stop
     while True:
         #while loop per song
-        if 15 >= timeNow.tm_hour >= 9:
+        if 23 >= timeNow.tm_hour >= 7:
             volume = 0.7
         else:
             volume = 0.3
@@ -93,7 +93,7 @@ def main():
             os.system('vlc --stop-time 30 music --sout-al vlc://quit')
 
         #reset variables
-        ID = " "
+        ID = ""
         print("FINISHED")
 
 #getUID with the I-Button as an arg
