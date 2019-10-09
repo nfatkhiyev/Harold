@@ -42,9 +42,10 @@ def main():
         #while loop per song
         while True:
             if 23 >= timeNow.tm_hour >= 7:
-                os.system("amixer sset PCM 60%")
+=======
+                os.system("amixer sset PCM 55%")
             else:
-                os.system("amixer sset PCM 35%")
+                os.system("amixer sset PCM 20%")
             #read the file and set the ID to the I-Button that was read 
             time.sleep(0.5)
             f = open(base_dir, "r")
