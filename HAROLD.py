@@ -41,14 +41,20 @@ def main():
                 os.system("amixer sset PCM 20%")
             
             #if I-Button is found play scanComplete
-            if ser.in_waiting > 0:
-                ID = ser.readline.decode('ascii')
+            if ser.in_waiting > 6:
+                ID = ser.readline().decode('ascii')
+                ser.flushInput()
+                if ID is None or 'ready' in ID:
+                    print("Waiting")
+                    continue
                 print(ID)
                 pygame.mixer.music.load("scanComplete")
                 pygame.mixer.music.play()
                 time.sleep(3)
+                break
             else:
                 print("Waiting")
+                continue
 
         #Strip the read id of the family code and replaces it with star
         ID = "*" + ID[2:].strip()
@@ -64,6 +70,7 @@ def main():
                 if pygame.mixer.music.get_busy() == False or pygame.mixer.music.get_pos()/1000 > 30:
                     break
             #stop the music
+            ser.flushInput()
             pygame.mixer.music.stop()
             #delete the music file from the root directory
             delete_music()
@@ -72,6 +79,7 @@ def main():
             player2 = vlc.MediaPlayer("/home/pi/Harold/music")
             player2.play()
             time.sleep(30)
+            ser.flushInput()
             player2.stop()
             delete_music()
 
