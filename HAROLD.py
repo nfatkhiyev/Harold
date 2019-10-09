@@ -42,7 +42,6 @@ def main():
         #while loop per song
         while True:
             if 23 >= timeNow.tm_hour >= 7:
-=======
                 os.system("amixer sset PCM 55%")
             else:
                 os.system("amixer sset PCM 20%")
