@@ -5,6 +5,7 @@ import csh_ldap
 import requests
 import pygame
 import vlc
+import serial
 from pygame import mixer
 import RPi.GPIO as GPIO
 
@@ -14,15 +15,8 @@ import config
 #set config password
 sudoPassword = config.SUDO_PASSWORD
 
-#setup I-Button paths
-os.system('echo %s|sudo modprobe wire timeout=1 slave_ttl=5' % (sudoPassword))
-os.system('echo %s|sudo modprobe w1-gpio' % (sudoPassword))
-os.system('echo %s|sudo modprobe w1-smem' % (sudoPassword))
-os.system('echo %s|sudo chmod a+w /sys/devices/w1_bus_master1/w1_master_slaves' % (sudoPassword))
-os.system('echo %s|sudo chmod a+w /sys/devices/w1_bus_master1/w1_master_remove' % (sudoPassword))
-os.system('echo %s|sudo chmod a+w /sys/devices/w1_bus_master1/w1_master_search' % (sudoPassword))
-base_dir = '/sys/devices/w1_bus_master1/w1_master_slaves'
-delete_dir = '/sys/devices/w1_bus_master1/w1_master_remove'
+#setup Serial Coms
+ser = serial.Serial('/dev/ttyACM0',9600)
 
 #create an instance
 instance = csh_ldap.CSHLDAP(config.LDAP_BIND_DN, config.PASSWORD)
@@ -32,7 +26,7 @@ HAROLD_AUTH = config.harold_auth
 
 pygame.mixer.init()
 
-timeNow = time.localtime()
+time_now = time.localtime()
 
 #main function
 def main():
@@ -41,41 +35,25 @@ def main():
     while True:
         #while loop per song
         while True:
-            if 23 >= timeNow.tm_hour >= 7:
+            if 23 >= time_now.tm_hour >= 7:
                 os.system("amixer sset PCM 55%")
             else:
                 os.system("amixer sset PCM 20%")
-            #read the file and set the ID to the I-Button that was read 
-            time.sleep(0.5)
-            f = open(base_dir, "r")
-            ID = f.readline()
-            time.sleep(0.1)
-            f.close()
-            #if I-Button is found play music
-            if ID != 'not found.\n':
+            
+            #if I-Button is found play scanComplete
+            if ser.in_waiting > 0:
+                ID = ser.readline.decode('ascii')
                 print(ID)
                 pygame.mixer.music.load("scanComplete")
                 pygame.mixer.music.play()
                 time.sleep(3)
-                #add the found I-Button to the base directory
-                while True:
-                    f2 = open(base_dir, "r")
-                    test = f2.readline()
-                    f2.close()
-                    if test != 'not found.\n':
-                        d = open(delete_dir, "w")
-                        d.write(test)
-                        continue
-                    else:
-                        print("iButton read file is clean")
-                        break
-                break
             else:
                 print("Waiting")
 
-        #play the music from the I-Button that currently exists in the base directory
-        ID = "*" + ID[3:].strip() + "01"
-        gets3Link(getAudiophiler(getUID(ID)))
+        #Strip the read id of the family code and replaces it with star
+        ID = "*" + ID[2:].strip()
+        #Dwonload te song from the s3_link
+        get_s3_link(get_audiophiler(get_uid(ID)))
         #try to play music and if you can't play the music then quit the vlc process
         try:
             #load the music
@@ -88,42 +66,41 @@ def main():
             #stop the music
             pygame.mixer.music.stop()
             #delete the music file from the root directory
-            deleteMusic()
+            delete_music()
         except Exception as e:
-            #os.system('vlc --stop-time 30 music --sout-al vlc://quit')
             print(e)
             player2 = vlc.MediaPlayer("/home/pi/Harold/music")
             player2.play()
             time.sleep(30)
             player2.stop()
-            deleteMusic()
+            delete_music()
 
         #reset variables
         ID = ""
         print("FINISHED")
 
 #getUID with the I-Button as an arg
-def getUID(iButtonCode):
+def get_uid(iButtonCode):
     user = instance.get_member_ibutton(iButtonCode)
     UID = user.uid
     return UID
 
 #getAudiophiler with UID as an arg
-def getAudiophiler(UID):
-    getHaroldURL = "https://audiophiler.csh.rit.edu/get_harold/" + UID
+def get_audiophiler(UID):
+    get_harold_url = "https://audiophiler.csh.rit.edu/get_harold/" + UID
     params = {
         'auth_key':HAROLD_AUTH
     }
     try:
-        s3Link = requests.post(url = getHaroldURL, json = params)
-        print(s3Link.text)
-        return s3Link.text
+        s3_link = requests.post(url = get_harold_url, json = params)
+        print(s3_link.text)
+        return s3_link.text
     except Exception as e:
         print(e)
         return "getAudiophiler ERROR"
 
 #gets3Link with the Link as an arg
-def gets3Link(link):
+def get_s3_link(link):
     try:
         music = requests.get(link, allow_redirects=True)
         open('music', 'wb').write(music.content)
@@ -132,7 +109,7 @@ def gets3Link(link):
         return "gets3Link ERROR"
 
 #remove the music file from the directory
-def deleteMusic():
+def delete_music():
     os.remove("music")
 
 #run main
