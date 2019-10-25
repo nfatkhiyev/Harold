@@ -18,7 +18,7 @@ import config
 sudoPassword = config.SUDO_PASSWORD
 
 #setup Serial Coms
-ser = serial.Serial('/dev/ttyACM0',9600)
+ser = serial.Serial('/dev/ttyACM1',9600)
 
 #create an instance
 instance = csh_ldap.CSHLDAP(config.LDAP_BIND_DN, config.PASSWORD)
