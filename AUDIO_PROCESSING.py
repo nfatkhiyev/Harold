@@ -25,5 +25,5 @@ def get_beat_times():
 def set_tempo(tempo):
     TEMPO = tempo
 
-def get_tempo()
+def get_tempo():
     return TEMPO
