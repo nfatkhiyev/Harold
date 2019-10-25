@@ -65,7 +65,7 @@ def main():
                 print("Waiting")
                 continue
         #Dwonload te song from the s3_link
-        get_s3_link(get_audiophiler(UID)
+        get_s3_link(get_audiophiler(UID))
         #try to play music with pygame and if you can't play the music then quit the vlc process
         try:
             #play the music file with pygame for max of 30 seconds and also flush serial
