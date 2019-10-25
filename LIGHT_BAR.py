@@ -7,6 +7,8 @@ GREEN_GPIO = 22
 BLUE_GPIO = 27
 
 def setup_light_bar_gpio():
+    GPIO.setmode(GPIO.BCM)
+
     GPIO.setup(RED_GPIO, GPIO.OUT)
     GPIO.setup(GREEN_GPIO, GPIO.OUT)
     GPIO.setup(BLUE_GPIO, GPIO.OUT)
