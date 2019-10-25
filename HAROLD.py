@@ -51,7 +51,8 @@ def main():
                 print(ID)
                 #Strip the read id of the family code and replaces it with star
                 ID = "*" + ID[2:].strip()
-                if get_uid(ID) == "mom":
+                UID = get_uid(ID)
+                if UID == "mom":
                     pygame.mixer.music.load("aaa")
                     pygame.mixer.music.play()
                     time.sleep(15)
@@ -66,7 +67,7 @@ def main():
                 continue
 
         #Dwonload te song from the s3_link
-        get_s3_link(get_audiophiler(get_uid(ID)))
+        get_s3_link(get_audiophiler(UID)
         #try to play music and if you can't play the music then quit the vlc process
         try:
             #load the music
