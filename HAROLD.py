@@ -57,9 +57,9 @@ def main():
                 ID = "*" + ID[2:].strip()
                 UID = get_uid(ID)
                 if UID == "mom":
-                    play_music_pygame("aaa", 17, False)
+                    play_music_pygame("aaa", 17, False, False)
                     break
-                play_music_pygame("scanComplete", 3, False)
+                play_music_pygame("scanComplete", 3, False, False)
                 break
             else:
                 print("Waiting")
@@ -69,13 +69,13 @@ def main():
         #try to play music with pygame and if you can't play the music then quit the vlc process
         try:
             #play the music file with pygame for max of 30 seconds and also flush serial
-            play_music_pygame("music", 30, True)
+            play_music_pygame("music", 30, True, True)
         #if music is unplayable in pygame, use vlc
         except Exception as e:
             print(e)
 
             os.system("ffmpeg -i music music.wav")
-            play_music_pygame("music.wav", 30, True)
+            play_music_pygame("music.wav", 30, True, True)
 
         finally:
             delete_music()
@@ -115,13 +115,14 @@ def get_s3_link(link):
 
 #plays music till done or limit t has been reached
 #last parameter dictates wheter or not the serial line is flushed at the end of the song
-def play_music_pygame(music, t, flush_serial):
+def play_music_pygame(music, t, flush_serial, light):
     pygame.mixer.music.load(music)
     pygame.mixer.music.play()
     while True:
-        time = pygame.mixer.music.get_pos() / 1000
-        if time == AUDIO_PROCESSING.get_beat_times()[0]:
-            LIGHT_BAR.set_light_bar(LIGHT_BAR.get_random_gpio_state, LIGHT_BAR.get_random_gpio_state, LIGHT_BAR.get_random_gpio_state)
+        if light:
+            time = pygame.mixer.music.get_pos() / 1000
+            if time == AUDIO_PROCESSING.get_beat_times()[0]:
+                LIGHT_BAR.set_light_bar(LIGHT_BAR.get_random_gpio_state, LIGHT_BAR.get_random_gpio_state, LIGHT_BAR.get_random_gpio_state)
         if pygame.mixer.music.get_busy() == False or pygame.mixer.music.get_pos()/1000 > t:
             break
     if flush_serial:
