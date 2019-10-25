@@ -2,6 +2,7 @@ TEST.py
 config.py
 /__pycache__
 /venv
+.vscode
 error.log
 .Harold.py.swp
 HAROLD.py.save

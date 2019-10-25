@@ -6,6 +6,8 @@ import requests
 import pygame
 import vlc
 import serial
+import LIGHT_BAR
+import AUDIO_PROCESSING
 from pygame import mixer
 import RPi.GPIO as GPIO
 
@@ -29,6 +31,8 @@ pygame.mixer.init()
 time_now = time.localtime()
 
 max_counter = 0
+
+LIGHT_BAR.setup_light_bar_gpio()
 #main function
 def main():
     ID = ""
@@ -53,42 +57,27 @@ def main():
                 ID = "*" + ID[2:].strip()
                 UID = get_uid(ID)
                 if UID == "mom":
-                    pygame.mixer.music.load("aaa")
-                    pygame.mixer.music.play()
-                    time.sleep(15)
-                    pygame.mixer.music.stop()
+                    play_music_pygame("aaa", 17, False)
                     break
-                pygame.mixer.music.load("scanComplete")
-                pygame.mixer.music.play()
-                time.sleep(3)
+                play_music_pygame("scanComplete", 3, False)
                 break
             else:
                 print("Waiting")
                 continue
-
         #Dwonload te song from the s3_link
         get_s3_link(get_audiophiler(UID)
-        #try to play music and if you can't play the music then quit the vlc process
+        #try to play music with pygame and if you can't play the music then quit the vlc process
         try:
-            #load the music
-            pygame.mixer.music.load("music")
-            pygame.mixer.music.play()
-            #play the music for thirty seconds
-            while True:
-                if pygame.mixer.music.get_busy() == False or pygame.mixer.music.get_pos()/1000 > 30:
-                    break
-            #stop the music
-            ser.flushInput()
-            pygame.mixer.music.stop()
-            #delete the music file from the root directory
-            delete_music()
+            #play the music file with pygame for max of 30 seconds and also flush serial
+            play_music_pygame("music", 30, True)
+        #if music is unplayable in pygame, use vlc
         except Exception as e:
             print(e)
-            player2 = vlc.MediaPlayer("/home/pi/Harold/music")
-            player2.play()
-            time.sleep(30)
-            ser.flushInput()
-            player2.stop()
+
+            os.system("ffmpeg -i music music.wav")
+            play_music_pygame("music.wav", 30, True)
+
+        finally:
             delete_music()
 
         #reset variables
@@ -124,9 +113,26 @@ def get_s3_link(link):
         print(e)
         return "gets3Link ERROR"
 
+#plays music till done or limit t has been reached
+#last parameter dictates wheter or not the serial line is flushed at the end of the song
+def play_music_pygame(music, t, flush_serial):
+    pygame.mixer.music.load(music)
+    pygame.mixer.music.play()
+    while True:
+        time = pygame.mixer.music.get_pos() / 1000
+        if time = AUDIO_PROCESSING.get_beat_times()[0]:
+            LIGHT_BAR.set_light_bar(LIGHT_BAR.get_random_gpio_state, LIGHT_BAR.get_random_gpio_state, LIGHT_BAR.get_random_gpio_state)
+        if pygame.mixer.music.get_busy() == False or pygame.mixer.music.get_pos()/1000 > t:
+            break
+    if flush_serial:
+        ser.flushInput()
+    pygame.mixer.music.stop()
+    LIGHT_BAR.reset()
+
 #remove the music file from the directory
 def delete_music():
     os.remove("music")
+    os.remove("music.wav")
 
 #run main
 if __name__ == '__main__':
