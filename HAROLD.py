@@ -28,6 +28,7 @@ pygame.mixer.init()
 
 time_now = time.localtime()
 
+max_counter = 0
 #main function
 def main():
     ID = ""
@@ -36,9 +37,9 @@ def main():
         #while loop per song
         while True:
             if 23 >= time_now.tm_hour >= 7:
-                os.system("amixer sset PCM 55%")
+                os.system("amixer set Master 73%")
             else:
-                os.system("amixer sset PCM 20%")
+                os.system("amixer set Master 20%")
             
             #if I-Button is found play scanComplete
             if ser.in_waiting > 6:
@@ -48,6 +49,14 @@ def main():
                     print("Waiting")
                     continue
                 print(ID)
+                #Strip the read id of the family code and replaces it with star
+                ID = "*" + ID[2:].strip()
+                if get_uid(ID) == "mom":
+                    pygame.mixer.music.load("aaa")
+                    pygame.mixer.music.play()
+                    time.sleep(15)
+                    pygame.mixer.music.stop()
+                    break
                 pygame.mixer.music.load("scanComplete")
                 pygame.mixer.music.play()
                 time.sleep(3)
@@ -56,8 +65,6 @@ def main():
                 print("Waiting")
                 continue
 
-        #Strip the read id of the family code and replaces it with star
-        ID = "*" + ID[2:].strip()
         #Dwonload te song from the s3_link
         get_s3_link(get_audiophiler(get_uid(ID)))
         #try to play music and if you can't play the music then quit the vlc process
