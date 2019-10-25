@@ -120,7 +120,7 @@ def play_music_pygame(music, t, flush_serial):
     pygame.mixer.music.play()
     while True:
         time = pygame.mixer.music.get_pos() / 1000
-        if time = AUDIO_PROCESSING.get_beat_times()[0]:
+        if time == AUDIO_PROCESSING.get_beat_times()[0]:
             LIGHT_BAR.set_light_bar(LIGHT_BAR.get_random_gpio_state, LIGHT_BAR.get_random_gpio_state, LIGHT_BAR.get_random_gpio_state)
         if pygame.mixer.music.get_busy() == False or pygame.mixer.music.get_pos()/1000 > t:
             break
