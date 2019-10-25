@@ -4,7 +4,7 @@ import os
 TEMPO = None
 
 def get_beat_times():
-    os.system("ffmpeg -i music musicA.vav")
+    os.system("ffmpeg -i music musicA.wav")
 
     x, sr = librosa.load('musicA.wav')
     tempo, beat_times = librosa.beat.beat_track(x, sr=sr, start_bpm=60, units='time')
