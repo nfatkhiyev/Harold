@@ -123,21 +123,21 @@ def get_s3_link(link):
 def play_music_pygame(music, t, flush_serial, light):
     beat_array = []
     
-    if light:
-        beat_array = AUDIO_PROCESSING.get_beat_times()
-        print("beat array initialized")
+    #if light:
+    #    beat_array = AUDIO_PROCESSING.get_beat_times()
+    #    print("beat array initialized")
 
-        double_beat_array = [beat_array[0]]
-        for beat in range(0,len(beat_array)-2):
-            average = (beat_array[beat]+beat_array[beat+1])/2
-            double_beat_array.append(average)
-            double_beat_array.append(beat_array[beat+1])
+    #    double_beat_array = [beat_array[0]]
+    #    for beat in range(0,len(beat_array)-2):
+    #        average = (beat_array[beat]+beat_array[beat+1])/2
+    #        double_beat_array.append(average)
+    #        double_beat_array.append(beat_array[beat+1])
 
-        quad_beat_array = [double_beat_array[0]]
-        for beat in range(0,len(double_beat_array)-2):
-            average = (double_beat_array[beat]+double_beat_array[beat+1])/2
-            quad_beat_array.append(average)
-            quad_beat_array.append(double_beat_array[beat+1])
+    #    quad_beat_array = [double_beat_array[0]]
+    #    for beat in range(0,len(double_beat_array)-2):
+    #        average = (double_beat_array[beat]+double_beat_array[beat+1])/2
+    #        quad_beat_array.append(average)
+    #        quad_beat_array.append(double_beat_array[beat+1])
            
     pygame.mixer.music.load(music)
     pygame.mixer.music.play()
@@ -146,15 +146,15 @@ def play_music_pygame(music, t, flush_serial, light):
 
     while True:
         if light:
-            time1 = pygame.mixer.music.get_pos() / 1000
-            if i < len(quad_beat_array) and time1 > quad_beat_array[i]:
-                print(quad_beat_array[i])
-                i+=1
-                print("beat")
-                LIGHT_BAR.set_light_bar(LIGHT_BAR.get_random_gpio_state(), LIGHT_BAR.get_random_gpio_state(), LIGHT_BAR.get_random_gpio_state())
-                msg = ser_light.write(b'7')
-                print(msg)
-                time.sleep(0.01)
+        #    time1 = pygame.mixer.music.get_pos() / 1000
+        #    if i < len(quad_beat_array) and time1 > quad_beat_array[i]:
+        #        print(quad_beat_array[i])
+        #        i+=1
+            print("beat")
+            LIGHT_BAR.set_light_bar(LIGHT_BAR.get_random_gpio_state(), LIGHT_BAR.get_random_gpio_state(), LIGHT_BAR.get_random_gpio_state())
+            msg = ser_light.write(b'7')
+            print(msg)
+            time.sleep(0.2)
                 
             #LIGHT_BAR.set_light_bar(LIGHT_BAR.get_random_gpio_state(), LIGHT_BAR.get_random_gpio_state(), LIGHT_BAR.get_random_gpio_state())
             
