@@ -20,6 +20,8 @@ def get_beat_times():
     
     os.remove("musicA.wav")
 
+    print(beat_times_thirty)
+    
     return beat_times_thirty
 
 def set_tempo(tempo):

@@ -18,7 +18,8 @@ import config
 sudoPassword = config.SUDO_PASSWORD
 
 #setup Serial Coms
-ser = serial.Serial('/dev/ttyACM1',9600)
+ser = serial.Serial('/dev/ttyACM0',9600)
+ser_light = serial.Serial('/dev/ttyACM1',9600)
 
 #create an instance
 instance = csh_ldap.CSHLDAP(config.LDAP_BIND_DN, config.PASSWORD)
@@ -33,9 +34,13 @@ time_now = time.localtime()
 max_counter = 0
 
 LIGHT_BAR.setup_light_bar_gpio()
+
 #main function
 def main():
+    LIGHT_BAR.reset()
+
     ID = ""
+
     #keep the whole program running so it doesn't play one song and stop
     while True:
         #while loop per song
@@ -57,9 +62,9 @@ def main():
                 ID = "*" + ID[2:].strip()
                 UID = get_uid(ID)
                 if UID == "mom":
-                    play_music_pygame("aaa", 17, False, False)
+                    play_music_pygame("aaa", 22, False, False)
                     break
-                play_music_pygame("scanComplete", 3, False, False)
+                play_music_pygame("scanComplete", 10, False, False)
                 break
             else:
                 print("Waiting")
@@ -116,13 +121,43 @@ def get_s3_link(link):
 #plays music till done or limit t has been reached
 #last parameter dictates wheter or not the serial line is flushed at the end of the song
 def play_music_pygame(music, t, flush_serial, light):
+    beat_array = []
+    
+    if light:
+        beat_array = AUDIO_PROCESSING.get_beat_times()
+        print("beat array initialized")
+
+        double_beat_array = [beat_array[0]]
+        for beat in range(0,len(beat_array)-2):
+            average = (beat_array[beat]+beat_array[beat+1])/2
+            double_beat_array.append(average)
+            double_beat_array.append(beat_array[beat+1])
+
+        quad_beat_array = [double_beat_array[0]]
+        for beat in range(0,len(double_beat_array)-2):
+            average = (double_beat_array[beat]+double_beat_array[beat+1])/2
+            quad_beat_array.append(average)
+            quad_beat_array.append(double_beat_array[beat+1])
+           
     pygame.mixer.music.load(music)
     pygame.mixer.music.play()
+
+    i = 0
+
     while True:
         if light:
-            time = pygame.mixer.music.get_pos() / 1000
-            if time == AUDIO_PROCESSING.get_beat_times()[0]:
-                LIGHT_BAR.set_light_bar(LIGHT_BAR.get_random_gpio_state, LIGHT_BAR.get_random_gpio_state, LIGHT_BAR.get_random_gpio_state)
+            time1 = pygame.mixer.music.get_pos() / 1000
+            if i < len(quad_beat_array) and time1 > quad_beat_array[i]:
+                print(quad_beat_array[i])
+                i+=1
+                print("beat")
+                LIGHT_BAR.set_light_bar(LIGHT_BAR.get_random_gpio_state(), LIGHT_BAR.get_random_gpio_state(), LIGHT_BAR.get_random_gpio_state())
+                msg = ser_light.write(b'7')
+                print(msg)
+                time.sleep(0.01)
+                
+            #LIGHT_BAR.set_light_bar(LIGHT_BAR.get_random_gpio_state(), LIGHT_BAR.get_random_gpio_state(), LIGHT_BAR.get_random_gpio_state())
+            
         if pygame.mixer.music.get_busy() == False or pygame.mixer.music.get_pos()/1000 > t:
             break
     if flush_serial:
@@ -133,8 +168,10 @@ def play_music_pygame(music, t, flush_serial, light):
 #remove the music file from the directory
 def delete_music():
     os.remove("music")
-    os.remove("music.wav")
-
+    try:
+        os.remove("music.wav")
+    except:
+        print("no music.wav")
 #run main
 if __name__ == '__main__':
     main()
