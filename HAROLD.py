@@ -35,9 +35,9 @@ max_counter = 0
 
 LIGHT_BAR.setup_light_bar_gpio()
 
-beat_array = []
+global beat_array = []
 
-haroldAnalyzed = False
+global haroldAnalyzed = False
 
 #main function
 def main():
@@ -73,8 +73,6 @@ def main():
             else:
                 print("Waiting")
                 continue
-        #Dwonload te song from the s3_link
-        get_s3_link(get_audiophiler(UID))
         #try to play music with pygame and if you can't play the music then quit the vlc process
         try:
             #play the music file with pygame for max of 30 seconds and also flush serial
@@ -130,6 +128,8 @@ def play_music_pygame(music, t, flush_serial, light):
     pygame.mixer.music.play()
 
     if not haroldAnalyzed:
+        #Download te song from the s3_link
+        get_s3_link(get_audiophiler(UID))
         beat_array = AUDIO_PROCESSING.get_beat_times()
         haroldAnalyzed = True
         
