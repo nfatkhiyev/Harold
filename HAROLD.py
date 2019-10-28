@@ -68,9 +68,9 @@ def main():
                 ID = "*" + ID[2:].strip()
                 UID = get_uid(ID)
                 if UID == "mom":
-                    play_music_pygame("aaa", 22, False, False)
+                    play_music_pygame("aaa", 22, False, False, UID)
                     break
-                play_music_pygame("scanComplete", 10, False, False)
+                play_music_pygame("scanComplete", 10, False, False, UID)
                 break
             else:
                 print("Waiting")
@@ -78,13 +78,13 @@ def main():
         #try to play music with pygame and if you can't play the music then quit the vlc process
         try:
             #play the music file with pygame for max of 30 seconds and also flush serial
-            play_music_pygame("music", 30, True, True)
+            play_music_pygame("music", 30, True, True, UID)
         #if music is unplayable in pygame, use vlc
         except Exception as e:
             print(e)
 
             os.system("ffmpeg -i music music.wav")
-            play_music_pygame("music.wav", 30, True, True)
+            play_music_pygame("music.wav", 30, True, True, UID)
 
         finally:
             delete_music()
@@ -124,7 +124,7 @@ def get_s3_link(link):
 
 #plays music till done or limit t has been reached
 #last parameter dictates wheter or not the serial line is flushed at the end of the song
-def play_music_pygame(music, t, flush_serial, light):
+def play_music_pygame(music, t, flush_serial, light, UID):
     global harold_analyzed
 
     pygame.mixer.music.load(music)
