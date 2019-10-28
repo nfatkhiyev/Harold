@@ -24,7 +24,7 @@ def get_beat_times():
     for beat in range(0,len(beat_times_thirty)-1):
         average = (beat_times_thirty[beat]+beat_times_thirty[beat+1])/2
         double_beat_array.append(average)
-        double_beat_array.append(beat_array[beat+1])
+        double_beat_array.append(beat_times_thirty[beat+1])
 
     quad_beat_array = [double_beat_array[0]]
     for beat in range(0,len(double_beat_array)-1):
