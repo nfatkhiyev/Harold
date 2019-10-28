@@ -35,6 +35,10 @@ max_counter = 0
 
 LIGHT_BAR.setup_light_bar_gpio()
 
+beat_array = []
+
+haroldAnalyzed = False
+
 #main function
 def main():
     LIGHT_BAR.reset()
@@ -121,34 +125,24 @@ def get_s3_link(link):
 #plays music till done or limit t has been reached
 #last parameter dictates wheter or not the serial line is flushed at the end of the song
 def play_music_pygame(music, t, flush_serial, light):
-    beat_array = []
-    
-    if light:
-        beat_array = AUDIO_PROCESSING.get_beat_times()
-        print("beat array initialized")
 
-        double_beat_array = [beat_array[0]]
-        for beat in range(0,len(beat_array)-2):
-            average = (beat_array[beat]+beat_array[beat+1])/2
-            double_beat_array.append(average)
-            double_beat_array.append(beat_array[beat+1])
-
-        quad_beat_array = [double_beat_array[0]]
-        for beat in range(0,len(double_beat_array)-2):
-            average = (double_beat_array[beat]+double_beat_array[beat+1])/2
-            quad_beat_array.append(average)
-            quad_beat_array.append(double_beat_array[beat+1])
-           
     pygame.mixer.music.load(music)
     pygame.mixer.music.play()
+
+    if not haroldAnalyzed:
+        beat_array = AUDIO_PROCESSING.get_beat_times()
+        haroldAnalyzed = True
+        
+    elif haroldAnalyzed:
+        haroldAnalyzed = False
 
     i = 0
 
     while True:
         if light:
             time1 = pygame.mixer.music.get_pos() / 1000
-            if i < len(quad_beat_array) and time1 > quad_beat_array[i]:
-                print(quad_beat_array[i])
+            if i < len(beat_array) and time1 > beat_array[i]:
+                print(beat_array[i])
                 i+=1
                 print("beat")
                 LIGHT_BAR.set_light_bar(LIGHT_BAR.get_random_gpio_state(), LIGHT_BAR.get_random_gpio_state(), LIGHT_BAR.get_random_gpio_state())
