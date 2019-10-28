@@ -36,16 +36,14 @@ max_counter = 0
 LIGHT_BAR.setup_light_bar_gpio()
 
 global beat_array
+beat_array = []
 
-global haroldAnalyzed
+global harold_analyzed
+harold_analyzed = False
 
 #main function
 def main():
     LIGHT_BAR.reset()
-
-    beat_array = []
-
-    haroldAnalyzed = False
 
     ID = ""
 
@@ -127,18 +125,19 @@ def get_s3_link(link):
 #plays music till done or limit t has been reached
 #last parameter dictates wheter or not the serial line is flushed at the end of the song
 def play_music_pygame(music, t, flush_serial, light):
+    global harold_analyzed
 
     pygame.mixer.music.load(music)
     pygame.mixer.music.play()
 
-    if not haroldAnalyzed:
+    if not harold_analyzed:
         #Download te song from the s3_link
         get_s3_link(get_audiophiler(UID))
         beat_array = AUDIO_PROCESSING.get_beat_times()
-        haroldAnalyzed = True
+        harold_analyzed = True
         
-    elif haroldAnalyzed:
-        haroldAnalyzed = False
+    elif harold_analyzed:
+        harold_analyzed = False
 
     i = 0
 
