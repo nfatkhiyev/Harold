@@ -35,13 +35,17 @@ max_counter = 0
 
 LIGHT_BAR.setup_light_bar_gpio()
 
-global beat_array = []
+global beat_array
 
-global haroldAnalyzed = False
+global haroldAnalyzed
 
 #main function
 def main():
     LIGHT_BAR.reset()
+
+    beat_array = []
+
+    haroldAnalyzed = False
 
     ID = ""
 
