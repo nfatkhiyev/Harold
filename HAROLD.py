@@ -126,6 +126,7 @@ def get_s3_link(link):
 #last parameter dictates wheter or not the serial line is flushed at the end of the song
 def play_music_pygame(music, t, flush_serial, light, UID):
     global harold_analyzed
+    global beat_array
 
     pygame.mixer.music.load(music)
     pygame.mixer.music.play()
