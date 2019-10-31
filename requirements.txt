@@ -6,4 +6,4 @@ pygame~=1.9.6
 python-vlc~=3.0.7110
 csh_ldap~=2.2.0
 RPi.GPIO~=0.7.0
-
+mutagen

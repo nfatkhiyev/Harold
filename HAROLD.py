@@ -10,6 +10,7 @@ import LIGHT_BAR
 import AUDIO_PROCESSING
 from pygame import mixer
 import RPi.GPIO as GPIO
+from mutagen.flac import FLAC
 
 #import the config file
 import config
@@ -132,7 +133,7 @@ def play_music_pygame(music, t, flush_serial, light, UID):
     pygame.mixer.music.play()
 
     if not harold_analyzed:
-        #Download te song from the s3_link
+        #Download the song from the s3_link
         get_s3_link(get_audiophiler(UID))
         beat_array = AUDIO_PROCESSING.get_beat_times()
         harold_analyzed = True
@@ -162,6 +163,11 @@ def play_music_pygame(music, t, flush_serial, light, UID):
         ser.flushInput()
     pygame.mixer.music.stop()
     LIGHT_BAR.reset()
+
+#get metadata from FLAC file
+def get_metadata(filename):
+    file = FLAC(filename)
+    return file["title"], file["artist"], file["beats"]
 
 #remove the music file from the directory
 def delete_music():
