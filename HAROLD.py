@@ -8,6 +8,7 @@ import vlc
 import serial
 from pygame import mixer
 import RPi.GPIO as GPIO
+from mutagen.flac import FLAC
 
 #import the config file
 import config
@@ -65,13 +66,14 @@ def main():
                 print("Waiting")
                 continue
 
-        #Dwonload te song from the s3_link
+        #Dwonload the song from the s3_link
         get_s3_link(get_audiophiler(get_uid(ID)))
         #try to play music and if you can't play the music then quit the vlc process
         try:
             #load the music
             pygame.mixer.music.load("music")
             pygame.mixer.music.play()
+
             #play the music for thirty seconds
             while True:
                 if pygame.mixer.music.get_busy() == False or pygame.mixer.music.get_pos()/1000 > 30:
@@ -99,6 +101,11 @@ def get_uid(iButtonCode):
     user = instance.get_member_ibutton(iButtonCode)
     UID = user.uid
     return UID
+
+#getMetadata from FLAC file
+def get_metadata(filename):
+    file = FLAC(filename)
+    return file.info.title, file.info.artist
 
 #getAudiophiler with UID as an arg
 def get_audiophiler(UID):
