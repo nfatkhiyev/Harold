@@ -36,12 +36,6 @@ max_counter = 0
 
 LIGHT_BAR.setup_light_bar_gpio()
 
-global beat_array
-beat_array = []
-
-global harold_analyzed
-harold_analyzed = False
-
 #main function
 def main():
     LIGHT_BAR.reset()
@@ -56,7 +50,7 @@ def main():
                 os.system("amixer set Master 73%")
             else:
                 os.system("amixer set Master 20%")
-            
+
             #if I-Button is found play scanComplete
             if ser.in_waiting > 6:
                 ID = ser.readline().decode('ascii')
@@ -76,6 +70,10 @@ def main():
             else:
                 print("Waiting")
                 continue
+
+        #Download Harold from s3
+        get_s3_link(get_audiophiler(UID))
+
         #try to play music with pygame and if you can't play the music then quit the vlc process
         try:
             #play the music file with pygame for max of 30 seconds and also flush serial
@@ -102,7 +100,8 @@ def get_uid(iButtonCode):
 
 #getAudiophiler with UID as an arg
 def get_audiophiler(UID):
-    get_harold_url = "https://audiophiler.csh.rit.edu/get_harold/" + UID
+    #get_harold_url = "https://audiophiler.csh.rit.edu/get_harold/" + UID
+    get_harold_url = "https://audiophiler-dev-nate.cs.house/get_harold/" + UID
     params = {
         'auth_key':HAROLD_AUTH
     }
@@ -126,20 +125,21 @@ def get_s3_link(link):
 #plays music till done or limit t has been reached
 #last parameter dictates wheter or not the serial line is flushed at the end of the song
 def play_music_pygame(music, t, flush_serial, light, UID):
-    global harold_analyzed
-    global beat_array
 
     pygame.mixer.music.load(music)
-    pygame.mixer.music.play()
 
-    if not harold_analyzed:
-        #Download the song from the s3_link
-        get_s3_link(get_audiophiler(UID))
-        beat_array = AUDIO_PROCESSING.get_beat_times()
-        harold_analyzed = True
-        
-    elif harold_analyzed:
-        harold_analyzed = False
+    print(UID)
+
+    beat_array = []
+
+    if light:
+        #title, author, beat_time_string = get_metadata(music)
+        _,_,beat_time_string = get_metadata(music)
+        beat_array = [float(i) for i in s.split(',')]
+        #narrator_url = ""
+        #requests.get(link + author + title + UID)
+
+    pygame.mixer.music.play()
 
     i = 0
 
@@ -154,9 +154,9 @@ def play_music_pygame(music, t, flush_serial, light, UID):
                 msg = ser_light.write(b'7')
                 print(msg)
                 time.sleep(0.01)
-                
+
             #LIGHT_BAR.set_light_bar(LIGHT_BAR.get_random_gpio_state(), LIGHT_BAR.get_random_gpio_state(), LIGHT_BAR.get_random_gpio_state())
-            
+
         if pygame.mixer.music.get_busy() == False or pygame.mixer.music.get_pos()/1000 > t:
             break
     if flush_serial:
