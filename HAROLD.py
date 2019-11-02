@@ -82,8 +82,8 @@ def main():
         except Exception as e:
             print(e)
 
-            os.system("ffmpeg -i music music.wav")
-            play_music_pygame("music.wav", 30, True, True, UID)
+            os.system("ffmpeg -i music music.flac")
+            play_music_pygame("music.flac", 30, True, True, UID)
 
         finally:
             delete_music()
@@ -101,7 +101,7 @@ def get_uid(iButtonCode):
 #getAudiophiler with UID as an arg
 def get_audiophiler(UID):
     #get_harold_url = "https://audiophiler.csh.rit.edu/get_harold/" + UID
-    get_harold_url = "https://audiophiler-dev-nate.cs.house/get_harold/" + UID
+    get_harold_url = "http://audiophiler-dev-nate.cs.house/get_harold/" + UID
     params = {
         'auth_key':HAROLD_AUTH
     }
@@ -136,6 +136,7 @@ def play_music_pygame(music, t, flush_serial, light, UID):
         #title, author, beat_time_string = get_metadata(music)
         _,_,beat_time_string = get_metadata(music)
         beat_array = [float(i) for i in s.split(',')]
+        print (beat_array)
         #narrator_url = ""
         #requests.get(link + author + title + UID)
 
