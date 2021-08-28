@@ -18,8 +18,8 @@ import config
 sudoPassword = config.SUDO_PASSWORD
 
 #setup Serial Coms
-ser = serial.Serial('/dev/ttyACM0',9600)
-ser_light = serial.Serial('/dev/ttyACM1',9600)
+ser = serial.Serial('/dev/ttyACM1',9600)
+ser_light = serial.Serial('/dev/ttyACM0',9600)
 
 #create an instance
 instance = csh_ldap.CSHLDAP(config.LDAP_BIND_DN, config.PASSWORD)
@@ -46,9 +46,11 @@ def main():
         #while loop per song
         while True:
             if 23 >= time_now.tm_hour >= 7:
-                os.system("amixer set Master 73%")
+                os.system("amixer set Headphone 100%")
+                #os.system("amixer set Headphone 73%")
             else:
-                os.system("amixer set Master 20%")
+                os.system("amixer set Headphone 73%")
+                #os.system("amixer set Headphone 24%")
             
             #if I-Button is found play scanComplete
             if ser.in_waiting > 6:
@@ -64,7 +66,7 @@ def main():
                 if UID == "mom":
                     play_music_pygame("aaa", 22, False, False)
                     break
-                play_music_pygame("scanComplete", 10, False, False)
+                play_music_pygame("scan-complete-mom.mp3", 10, False, False)
                 break
             else:
                 print("Waiting")
