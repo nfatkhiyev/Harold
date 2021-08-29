@@ -31,55 +31,42 @@ max_counter = 0
 
 LIGHT_BAR.setup_light_bar_gpio()
 
+def get_volume():
+    return 100 if 23 >= time_now.tm_hour >= 7 else 73
+
 #main function
 def main():
+    os.system("amixer set Headphone 100%")
     LIGHT_BAR.reset()
-
-    ID = ""
 
     #keep the whole program running so it doesn't play one song and stop
     while True:
-        #while loop per song
-        while True:
-            if 23 >= time_now.tm_hour >= 7:
-                os.system("amixer set Headphone 100%")
-                #os.system("amixer set Headphone 73%")
-            else:
-                os.system("amixer set Headphone 73%")
-                #os.system("amixer set Headphone 24%")
-            
-            #if I-Button is found play scanComplete
-            if ser.in_waiting > 6:
-                ID = ser.readline().decode('ascii')
-                ser.flushInput()
-                if ID is None or 'ready' in ID:
-                    print("Waiting")
-                    continue
-                print(ID)
-                #Strip the read id of the family code and replaces it with star
-                ID = "*" + ID[2:].strip()
-                UID = get_uid(ID)
-                if UID == "mom":
-                    play_music("aaa.mp3", 22, False, False)
-                    break
-                play_music("scan-complete-mom.mp3", 10, False, False)
-                break
-            else:
-                print("Waiting")
-                continue
-
+        #if I-Button is found play scanComplete
+        ID = ser.read_until().decode('ascii')
+        ser.reset_input_buffer()
+        if ID is None or 'ready' in ID or ID.strip() == '':
+            continue
+        print("Scanned: " + ID)
+        #Strip the read id of the family code and replaces it with star
+        ID = "*" + ID[2:].strip()
+        UID = get_uid(ID)
+        if not UID:
+            continue
+            ser.reset_input_buffer()
+        elif UID == "mom":
+            play_music("aaa.mp3", 22, False, False)
+        else:
+            play_music("scan-complete-mom.mp3", 10, False, False)
         #stream the music file with ffmpeg for max of 30 seconds and also flush serial
         play_music(get_audiophiler(UID), 30, True, True)
 
-        #reset variables
-        ID = ""
+        ser.reset_input_buffer()
         print("FINISHED")
 
 #getUID with the I-Button as an arg
 def get_uid(iButtonCode):
     user = instance.get_member_ibutton(iButtonCode)
-    UID = user.uid
-    return UID
+    return user.uid if user != None else None
 
 #getAudiophiler with UID as an arg
 def get_audiophiler(UID):
@@ -115,9 +102,12 @@ def play_music(music, t, flush_serial, light):
     #        average = (double_beat_array[beat]+double_beat_array[beat+1])/2
     #        quad_beat_array.append(average)
     #        quad_beat_array.append(double_beat_array[beat+1])
-           
-    out_process = subprocess.Popen(["ffplay", music, "-t", str(t),
-        "-b:a", "64k", "-nodisp", "-autoexit"])
+
+    args = ["ffplay", music, "-t", str(t),
+        "-b:a", "64k", "-nodisp", "-autoexit",
+        "-volume", str(get_volume()), "-loglevel", "error"]
+    print("Calling with args: " + str(args))
+    out_process = subprocess.Popen(args)
 
     i = 0
 
