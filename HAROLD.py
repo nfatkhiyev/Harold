@@ -60,7 +60,7 @@ def main():
                 ID = "*" + ID[2:].strip()
                 UID = get_uid(ID)
                 if UID == "mom":
-                    play_music("aaa", 22, False, False)
+                    play_music("aaa.mp3", 22, False, False)
                     break
                 play_music("scan-complete-mom.mp3", 10, False, False)
                 break
