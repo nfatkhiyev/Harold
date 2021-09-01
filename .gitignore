@@ -1,13 +1,12 @@
-/Harold_Arduino
 TEST.py
 config.py
 /__pycache__
 /venv
+.vscode
 error.log
 .Harold.py.swp
 HAROLD.py.save
 scanComplete
 music
-aaa
 ping
 
